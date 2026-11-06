@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: efendiev_murad_dz2_postgres
+    environment:
+      POSTGRES_DB: seminar_db
+      POSTGRES_USER: ripper666
+      POSTGRES_PASSWORD: password_ripper_666
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --auth-host=scram-sha-256 --auth-local=scram-sha-256"
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata_dz2:/var/lib/postgresql
+      - ./sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ripper666 -d seminar_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    networks:
+      - app_net_dz2
+
+  app:
+    build: .
+    image: efendiev_murad_dz2_app:1.0
+    # container_name: efendiev_murad_dz2_app
+    env_file: .env
+    environment:
+      DB_HOST: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+    networks:
+      - app_net_dz2
+
+volumes:
+  pgdata_dz2:
+
+networks:
+  app_net_dz2:
+    driver: bridge

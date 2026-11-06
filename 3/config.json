@@ -1,0 +1,6 @@
+{
+  "host": "localhost",
+  "port": 5433,
+  "dbname": "seminar_db",
+  "connect_timeout": 5
+}
